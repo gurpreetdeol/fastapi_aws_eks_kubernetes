@@ -11,9 +11,8 @@ class User(Base):
     name = Column(String(50))
     email = Column(String(255), unique=True)
     password = Column(String(255))
-
-    # order = relationship("Order", back_populates="user_info")
-    # cart = relationship("Cart", back_populates="user_cart")
+    cart = relationship("Cart", back_populates="user_cart")
+    order = relationship("Order", back_populates="user_info")
 
     def __init__(self, name, email, password, *args, **kwargs):
         self.name = name

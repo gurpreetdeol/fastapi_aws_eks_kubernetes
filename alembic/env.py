@@ -1,9 +1,9 @@
 from logging.config import fileConfig
 
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
+from logging.config import fileConfig
 
 from alembic import context
+from sqlalchemy import engine_from_config, pool
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -17,10 +17,14 @@ fileConfig(config.config_file_name)
 from ecommerce import config as config_env
 from ecommerce.db import Base
 from ecommerce.user.models import User
+from ecommerce.products.models import Product, Category
+from ecommerce.cart.models import Cart, CartItems
+from ecommerce.orders.models import Order, OrderDetails
 
 # add your model's MetaData object here
 # for 'autogenerate' support
 # from myapp import mymodel
+# target_metadata = mymodel.Base.metadata
 target_metadata = Base.metadata
 
 
@@ -35,6 +39,7 @@ def get_url():
     db_password = config_env.DATABASE_PASSWORD
     db_host = config_env.DATABASE_HOST
     db_name = config_env.DATABASE_NAME
+    return f"postgresql://{db_user}:{db_password}@{db_host}/{db_name}"
 
 
 def run_migrations_offline():
@@ -51,10 +56,7 @@ def run_migrations_offline():
     """
     url = get_url()
     context.configure(
-        url=url,
-        target_metadata=target_metadata,
-        literal_binds=True,
-        dialect_opts={"paramstyle": "named"},
+        url=url, target_metadata=target_metadata, literal_binds=True, compare_type=True
     )
 
     with context.begin_transaction():
@@ -68,12 +70,6 @@ def run_migrations_online():
     and associate a connection with the context.
 
     """
-    # connectable = engine_from_config(
-    #     config.get_section(config.config_ini_section, {}),
-    #     prefix="sqlalchemy.",
-    #     poolclass=pool.NullPool,
-    # )
-
     configuration = config.get_section(config.config_ini_section)
     configuration['sqlalchemy.url'] = get_url()
     connectable = engine_from_config(
